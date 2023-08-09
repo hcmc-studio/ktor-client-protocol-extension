@@ -7,9 +7,9 @@ import io.ktor.http.*
 import io.ktor.util.*
 import studio.hcmc.kotlin.protocol.DataTransferObject
 
-@KtorDsl
-suspend inline fun HttpClient.get(url: String, vararg parameters: Pair<String, Any?>, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
-    return get(urlString = url) {
+suspend inline fun HttpClient.get(urlString: String, vararg parameters: Pair<String, Any?>, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+    return get {
+        url(urlString)
         for ((name, value) in parameters) {
             if (value is Iterable<*>) {
                 val values = value.map { if (it is String) it else it.toString() }
@@ -26,9 +26,9 @@ suspend inline fun HttpClient.get(url: String, vararg parameters: Pair<String, A
     }
 }
 
-@KtorDsl
-suspend inline fun <reified T : DataTransferObject> HttpClient.post(url: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
-    return post(urlString = url) {
+suspend inline fun <reified T : DataTransferObject> HttpClient.post(urlString: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+    return post {
+        url(urlString)
         setBody(dto)
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)
@@ -36,9 +36,9 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.post(url: String,
     }
 }
 
-@KtorDsl
-suspend inline fun <reified T : DataTransferObject> HttpClient.put(url: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
-    return put(urlString = url) {
+suspend inline fun <reified T : DataTransferObject> HttpClient.put(urlString: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+    return put {
+        url(urlString)
         setBody(dto)
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)
@@ -46,9 +46,9 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.put(url: String, 
     }
 }
 
-@KtorDsl
-suspend inline fun <reified T : DataTransferObject> HttpClient.patch(url: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
-    return patch(urlString = url) {
+suspend inline fun <reified T : DataTransferObject> HttpClient.patch(urlString: String, dto: T, block: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+    return patch {
+        url(urlString)
         setBody(dto)
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)
