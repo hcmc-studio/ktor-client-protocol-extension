@@ -15,11 +15,11 @@ suspend inline fun HttpResponse.bodyAsEmpty(): Result<Response.Empty> {
     return bodyAsResponse()
 }
 
-suspend inline fun <reified VO : ValueObject> HttpResponse.bodyAsObject(): Result<Response.Object<VO>> {
+suspend inline fun <reified R> HttpResponse.bodyAsObject(): Result<Response.Object<R>> {
     return bodyAsResponse()
 }
 
-suspend inline fun <reified VO : ValueObject> HttpResponse.bodyAsArray(): Result<Response.Array<VO>> {
+suspend inline fun <reified R> HttpResponse.bodyAsArray(): Result<Response.Array<R>> {
     return bodyAsResponse()
 }
 
