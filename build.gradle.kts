@@ -27,7 +27,7 @@ publishing {
 }
 
 dependencies {
-    implementation("com.github.hcmc-studio:kotlin-protocol-extension:0.0.4-build-02")
+    implementation("com.github.hcmc-studio:kotlin-protocol-extension:0.0.4-release")
 
     implementation("io.ktor:ktor-client-core:2.3.2")
 }
