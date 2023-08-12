@@ -33,6 +33,7 @@ publishing {
 
 dependencies {
     implementation("com.github.hcmc-studio:kotlin-protocol-extension:$hcmc_extension_version")
+    implementation("com.github.hcmc-studio:ktor-routing-extension:$hcmc_extension_version")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
 }
