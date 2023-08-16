@@ -1,10 +1,42 @@
 package studio.hcmc.ktor.protocol
 
 import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import studio.hcmc.kotlin.protocol.DataTransferObject
+import java.net.URL as JavaUrl
+
+fun HttpClient(
+    url: JavaUrl,
+    json: Json = Json,
+    defaultRequestConfig: DefaultRequest.DefaultRequestBuilder.() -> Unit = { this.url(url.toString()) },
+    contentNegotiationConfig: ContentNegotiation.Config.() -> Unit = { json(json) },
+    loggingConfig: Logging.Config.() -> Unit = { logger = Logger.DEFAULT; level = LogLevel.ALL },
+    clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {}
+): HttpClient {
+    return HttpClient(CIO) {
+        defaultRequest {
+            defaultRequestConfig()
+        }
+
+        install(ContentNegotiation) {
+            contentNegotiationConfig()
+        }
+
+        install(Logging) {
+            loggingConfig()
+        }
+
+        clientConfig()
+    }
+}
 
 fun HttpRequestBuilder.applyParameters(vararg parameters: Pair<String, Any?>) {
     for ((name, value) in parameters) {

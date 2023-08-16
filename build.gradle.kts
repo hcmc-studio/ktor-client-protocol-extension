@@ -17,6 +17,10 @@ repositories {
     maven { setUrl("https://jitpack.io") }
 }
 
+java {
+    withSourcesJar()
+}
+
 kotlin {
     jvmToolchain(jdk_version.toInt())
 }
@@ -42,5 +46,10 @@ dependencies {
     implementation("com.github.hcmc-studio:kotlin-protocol-extension:$hcmc_extension_version")
     implementation("com.github.hcmc-studio:ktor-routing-extension:$hcmc_extension_version")
 
+    implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-logging-jvm:$ktor_version")
+    implementation("io.ktor:ktor-client-serialization:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
 }
