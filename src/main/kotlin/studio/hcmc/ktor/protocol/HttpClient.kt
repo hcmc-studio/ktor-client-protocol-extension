@@ -9,7 +9,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import studio.hcmc.kotlin.crypto.RSA
+import studio.hcmc.kotlin.crypto.encrypt
 import studio.hcmc.kotlin.protocol.DataTransferObject
 import java.net.URL as JavaUrl
 
@@ -99,6 +102,19 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.post(
         block()
     }
 }
+
+//suspend inline fun <reified T : DataTransferObject> HttpClient.post(
+//    urlString: String,
+//    dto: T,
+//    publicKey: String,
+//    keySize: Int,
+//    block: HttpRequestBuilder.() -> Unit = {}
+//): HttpResponse {
+//    val encryptedBody = RSA.encrypt(Json.encodeToString(dto), publicKey, keySize)
+//    val encryptedDTO =
+//    post(urlString, encryptedDTO, block)
+//
+//}
 
 suspend inline fun HttpClient.put(
     urlString: String,
