@@ -4,7 +4,6 @@ import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.errors.*
-import studio.hcmc.kotlin.protocol.ValueObject
 import studio.hcmc.kotlin.protocol.io.Response
 
 object HttpResponseUtil {

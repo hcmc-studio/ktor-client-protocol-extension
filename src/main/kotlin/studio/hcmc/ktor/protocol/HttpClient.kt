@@ -9,36 +9,44 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import studio.hcmc.kotlin.crypto.RSA
 import studio.hcmc.kotlin.crypto.encrypt
-import studio.hcmc.kotlin.protocol.DataTransferObject
+import studio.hcmc.kotlin.protocol.io.DataTransferObject
+import studio.hcmc.kotlin.protocol.io.EncryptedDataTransferObject
 import java.net.URL as JavaUrl
+
+object HttpClientAttributeKeys {
+    val serializer = AttributeKey<Json>("serializer")
+}
 
 fun HttpClient(
     url: JavaUrl,
     json: Json = Json,
-    defaultRequestConfig: DefaultRequest.DefaultRequestBuilder.() -> Unit = { this.url(url.toString()) },
-    contentNegotiationConfig: ContentNegotiation.Config.() -> Unit = { json(json) },
-    loggingConfig: Logging.Config.() -> Unit = { logger = Logger.DEFAULT; level = LogLevel.ALL },
     clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {}
 ): HttpClient {
-    return HttpClient(CIO) {
+    val client = HttpClient(CIO) {
         defaultRequest {
-            defaultRequestConfig()
+            url(url.toString())
         }
 
         install(ContentNegotiation) {
-            contentNegotiationConfig()
+            json(json)
         }
 
         install(Logging) {
-            loggingConfig()
+            logger = Logger.DEFAULT
+            level = LogLevel.ALL
         }
 
         clientConfig()
     }
+
+    client.attributes.put(HttpClientAttributeKeys.serializer, json)
+
+    return client
 }
 
 fun HttpRequestBuilder.applyParameters(vararg parameters: Pair<String, Any?>) {
@@ -52,6 +60,17 @@ fun HttpRequestBuilder.applyParameters(vararg parameters: Pair<String, Any?>) {
             this.url.parameters.append(name, value.toString())
         }
     }
+}
+
+inline fun <reified T : DataTransferObject> HttpClient.encryptDto(
+    dto: T,
+    publicKey: String,
+    keySize: Int
+): EncryptedDataTransferObject {
+    val jsonString = attributes[HttpClientAttributeKeys.serializer].encodeToString(dto)
+    val encryptedString = RSA.encrypt(jsonString, publicKey, keySize)
+
+    return EncryptedDataTransferObject(publicKey, encryptedString)
 }
 
 suspend inline fun HttpClient.get(
@@ -103,18 +122,15 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.post(
     }
 }
 
-//suspend inline fun <reified T : DataTransferObject> HttpClient.post(
-//    urlString: String,
-//    dto: T,
-//    publicKey: String,
-//    keySize: Int,
-//    block: HttpRequestBuilder.() -> Unit = {}
-//): HttpResponse {
-//    val encryptedBody = RSA.encrypt(Json.encodeToString(dto), publicKey, keySize)
-//    val encryptedDTO =
-//    post(urlString, encryptedDTO, block)
-//
-//}
+suspend inline fun <reified T : DataTransferObject> HttpClient.post(
+    urlString: String,
+    dto: T,
+    publicKey: String,
+    keySize: Int,
+    block: HttpRequestBuilder.() -> Unit = {}
+): HttpResponse {
+    return post(urlString, encryptDto(dto, publicKey, keySize), block)
+}
 
 suspend inline fun HttpClient.put(
     urlString: String,
@@ -141,6 +157,16 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.put(
     }
 }
 
+suspend inline fun <reified T : DataTransferObject> HttpClient.put(
+    urlString: String,
+    dto: T,
+    publicKey: String,
+    keySize: Int,
+    block: HttpRequestBuilder.() -> Unit = {}
+): HttpResponse {
+    return put(urlString, encryptDto(dto, publicKey, keySize), block)
+}
+
 suspend inline fun HttpClient.patch(
     urlString: String,
     block: HttpRequestBuilder.() -> Unit = {}
@@ -164,6 +190,16 @@ suspend inline fun <reified T : DataTransferObject> HttpClient.patch(
         accept(ContentType.Application.Json)
         block()
     }
+}
+
+suspend inline fun <reified T : DataTransferObject> HttpClient.patch(
+    urlString: String,
+    dto: T,
+    publicKey: String,
+    keySize: Int,
+    block: HttpRequestBuilder.() -> Unit = {}
+): HttpResponse {
+    return patch(urlString, encryptDto(dto, publicKey, keySize), block)
 }
 
 suspend inline fun HttpClient.delete(
