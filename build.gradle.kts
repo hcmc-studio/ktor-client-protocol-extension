@@ -1,4 +1,5 @@
 val project_version: String by project
+val kotlin_version: String by project
 val jdk_version: String by project
 val hcmc_extension_version: String by project
 val ktor_version: String by project
@@ -46,6 +47,8 @@ dependencies {
     implementation("com.github.hcmc-studio:kotlin-crypto-extension:$hcmc_extension_version")
     implementation("com.github.hcmc-studio:kotlin-protocol-extension:$hcmc_extension_version")
     implementation("com.github.hcmc-studio:ktor-routing-extension:$hcmc_extension_version")
+
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
 
     implementation("io.ktor:ktor-client-content-negotiation-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
