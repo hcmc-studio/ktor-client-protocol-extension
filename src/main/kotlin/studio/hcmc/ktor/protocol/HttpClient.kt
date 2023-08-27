@@ -18,15 +18,16 @@ import studio.hcmc.kotlin.protocol.io.DataTransferObject
 import studio.hcmc.kotlin.protocol.io.EncryptedDataTransferObject
 import java.net.URL as JavaUrl
 
-object HttpClientAttributeKeys {
-    val serializer = AttributeKey<Json>("serializer")
-}
+private val defaultJsonKey = AttributeKey<Json>("defaultJson")
+
+val HttpClient.defaultJson: Json get() = attributes[defaultJsonKey]
 
 fun HttpClient(
     url: JavaUrl,
-    json: Json = Json,
+    jsonSupplier: () -> Json = { Json },
     clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {}
 ): HttpClient {
+    val json = jsonSupplier()
     val client = HttpClient(CIO) {
         defaultRequest {
             url(url.toString())
@@ -44,7 +45,7 @@ fun HttpClient(
         clientConfig()
     }
 
-    client.attributes.put(HttpClientAttributeKeys.serializer, json)
+    client.attributes.put(defaultJsonKey, json)
 
     return client
 }
@@ -67,7 +68,7 @@ inline fun <reified T : DataTransferObject> HttpClient.encryptDto(
     publicKey: String,
     keySize: Int
 ): EncryptedDataTransferObject {
-    val jsonString = attributes[HttpClientAttributeKeys.serializer].encodeToString(dto)
+    val jsonString = defaultJson.encodeToString(dto)
     val encryptedString = RSA.encrypt(jsonString, publicKey, keySize)
 
     return EncryptedDataTransferObject(publicKey, encryptedString)
