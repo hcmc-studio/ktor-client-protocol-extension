@@ -47,6 +47,7 @@ dependencies {
     implementation("com.github.hcmc-studio:kotlin-crypto-extension:$hcmc_extension_version")
     implementation("com.github.hcmc-studio:kotlin-protocol-extension:$hcmc_extension_version")
     implementation("com.github.hcmc-studio:ktor-routing-extension:$hcmc_extension_version")
+    implementation("com.github.hcmc-studio:ktor-serialization-extension:$hcmc_extension_version")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
 
